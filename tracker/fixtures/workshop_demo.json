@@ -1,0 +1,198 @@
+[
+  {
+    "model": "tracker.shift",
+    "pk": 1,
+    "fields": {
+      "date": "2026-11-23",
+      "machine": "LATHE-01",
+      "component": "BUSH-20",
+      "period": "Day",
+      "produced": 10,
+      "dimension": 2,
+      "finish": 0,
+      "other": 0
+    }
+  },
+  {
+    "model": "tracker.shift",
+    "pk": 2,
+    "fields": {
+      "date": "2026-11-24",
+      "machine": "LATHE-01",
+      "component": "BUSH-20",
+      "period": "Day",
+      "produced": 90,
+      "dimension": 2,
+      "finish": 1,
+      "other": 0
+    }
+  },
+  {
+    "model": "tracker.shift",
+    "pk": 3,
+    "fields": {
+      "date": "2026-11-23",
+      "machine": "LATHE-02",
+      "component": "BUSH-20",
+      "period": "Day",
+      "produced": 100,
+      "dimension": 0,
+      "finish": 3,
+      "other": 0
+    }
+  },
+  {
+    "model": "tracker.shift",
+    "pk": 11,
+    "fields": {
+      "date": "2026-11-23",
+      "machine": "10",
+      "component": "PIN-30",
+      "period": "Day",
+      "produced": 160,
+      "dimension": 2,
+      "finish": 1,
+      "other": 0
+    }
+  },
+  {
+    "model": "tracker.shift",
+    "pk": 12,
+    "fields": {
+      "date": "2026-11-23",
+      "machine": "TURN-02",
+      "component": "SHAFT-24",
+      "period": "Day",
+      "produced": 130,
+      "dimension": 1,
+      "finish": 2,
+      "other": 0
+    }
+  },
+  {
+    "model": "tracker.shift",
+    "pk": 13,
+    "fields": {
+      "date": "2026-11-23",
+      "machine": "VMC-01",
+      "component": "BRACKET-12",
+      "period": "Day",
+      "produced": 75,
+      "dimension": 2,
+      "finish": 0,
+      "other": 1
+    }
+  },
+  {
+    "model": "tracker.shift",
+    "pk": 14,
+    "fields": {
+      "date": "2026-11-23",
+      "machine": "MILL-01",
+      "component": "PLATE-08",
+      "period": "Day",
+      "produced": 64,
+      "dimension": 0,
+      "finish": 1,
+      "other": 0
+    }
+  },
+  {
+    "model": "tracker.shift",
+    "pk": 15,
+    "fields": {
+      "date": "2026-11-23",
+      "machine": "DRILL-01",
+      "component": "FLANGE-06",
+      "period": "Day",
+      "produced": 180,
+      "dimension": 1,
+      "finish": 0,
+      "other": 1
+    }
+  },
+  {
+    "model": "tracker.shift",
+    "pk": 16,
+    "fields": {
+      "date": "2026-11-23",
+      "machine": "GRIND-01",
+      "component": "SLEEVE-18",
+      "period": "Day",
+      "produced": 95,
+      "dimension": 1,
+      "finish": 2,
+      "other": 0
+    }
+  },
+  {
+    "model": "tracker.shift",
+    "pk": 17,
+    "fields": {
+      "date": "2026-11-24",
+      "machine": "LATHE-02",
+      "component": "BUSH-20",
+      "period": "Day",
+      "produced": 110,
+      "dimension": 0,
+      "finish": 2,
+      "other": 0
+    }
+  },
+  {
+    "model": "tracker.shift",
+    "pk": 18,
+    "fields": {
+      "date": "2026-11-24",
+      "machine": "10",
+      "component": "PIN-30",
+      "period": "Day",
+      "produced": 165,
+      "dimension": 1,
+      "finish": 0,
+      "other": 1
+    }
+  },
+  {
+    "model": "tracker.shift",
+    "pk": 19,
+    "fields": {
+      "date": "2026-11-24",
+      "machine": "VMC-01",
+      "component": "BRACKET-12",
+      "period": "Day",
+      "produced": 80,
+      "dimension": 1,
+      "finish": 2,
+      "other": 0
+    }
+  },
+  {
+    "model": "tracker.shift",
+    "pk": 20,
+    "fields": {
+      "date": "2026-11-24",
+      "machine": "DRILL-01",
+      "component": "FLANGE-06",
+      "period": "Day",
+      "produced": 195,
+      "dimension": 2,
+      "finish": 0,
+      "other": 0
+    }
+  },
+  {
+    "model": "tracker.shift",
+    "pk": 21,
+    "fields": {
+      "date": "2026-11-24",
+      "machine": "GRIND-01",
+      "component": "SLEEVE-18",
+      "period": "Day",
+      "produced": 100,
+      "dimension": 0,
+      "finish": 2,
+      "other": 0
+    }
+  }
+]
