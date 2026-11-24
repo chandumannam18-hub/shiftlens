@@ -1,0 +1,116 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#031211">
+  <meta name="description" content="ShiftLens is a Django and SQLite workshop quality tracker for recording shifts, comparing machine output, and reviewing rejected parts.">
+  <title>{% if adding_shift %}Add a shift{% else %}Weekly report{% endif %} · ShiftLens</title>
+  <link rel="stylesheet" href="{% static 'tracker/dashboard.css' %}?v=10">
+  <link rel="stylesheet" href="{% static 'tracker/shift-report.css' %}?v=9">
+<script defer src="{% static 'tracker/dashboard.js' %}"></script></head>
+<body>
+<a class="skip-link" href="#overview">Skip to main content</a>
+<header><div class="wrap bar">
+  <a class="brand" href="?date={{ day }}"><span class="mark" aria-hidden="true"></span>ShiftLens</a>
+  {% if not adding_shift %}<nav aria-label="Report sections"><a href="#overview">Overview</a><a href="#output">Daily output</a><a href="#machines">Machines</a></nav>{% endif %}
+  {% if not adding_shift %}<a class="button primary" href="?date={{ day }}&amp;entry=1"><span aria-hidden="true">+</span> Add a shift</a>{% endif %}
+</div></header>
+<main class="wrap" id="overview" tabindex="-1">
+{% if adding_shift %}
+  <section class="form-page">
+    <a class="back" href="?date={{ day }}">← Weekly report</a>
+    <h1>Add a shift</h1>
+    <p class="intro">Enter the work done on one machine for one part.</p>
+    <form method="post" class="sheet entry">
+      {% csrf_token %}
+      <datalist id="workshop-machines">{% for name in machine_names.values %}<option value="{{ name }}"></option>{% endfor %}</datalist>
+      {% if form.errors %}<div class="error-box" role="alert">Check the details below and try again. {{ form.non_field_errors }}</div>{% endif %}
+      <fieldset><legend>Shift details</legend>
+        <div class="fields">{% for field in form %}{% if forloop.counter <= 4 %}
+          <div>{{ field.label_tag }}{{ field }}{{ field.errors }}</div>
+        {% endif %}{% endfor %}</div>
+      </fieldset>
+      <fieldset><legend>Parts made</legend>
+        <p id="total-help">Include the parts you rejected.</p>
+        <div class="total">{{ form.produced.label_tag }}{{ form.produced }}{{ form.produced.errors }}</div>
+      </fieldset>
+      <fieldset><legend>Why were parts rejected?</legend>
+        <p>Count each rejected part once. Leave the count at 0 if it doesn’t apply.</p>
+        <div class="fields defects">{% for field in form %}{% if forloop.counter > 5 %}
+          <div>{{ field.label_tag }}{{ field }}{{ field.errors }}</div>
+        {% endif %}{% endfor %}</div>
+      </fieldset>
+      <div class="actions"><button class="button primary">Save shift</button><a href="?date={{ day }}">Cancel</a></div>
+    </form>
+  </section>
+{% else %}
+  {% if saved %}<p class="notice" role="status">Shift saved. Your weekly totals are up to date.</p>{% endif %}
+  <div class="heading">
+    <div><h1>Weekly shift report</h1><p class="date-range">{{ week_start|date:"j M" }} – {{ week_end|date:"j M Y" }}</p></div>
+    <div class="filters">
+      <form method="get" class="machine-filter"><input type="hidden" name="date" value="{{ day }}">
+        <label for="machine-filter">Machine</label><select name="machine" id="machine-filter"><option value="">All machines</option>
+          {% for code,name in machine_names.items %}<option value="{{ code }}"{% if code == machine %} selected{% endif %}>{{ name }}</option>{% endfor %}
+        </select><button class="apply-filter" type="submit">Apply</button>
+      </form>
+      <div class="week-and-rate">
+      <details class="week"><summary>Change week</summary><form method="get">
+        {% if machine %}<input type="hidden" name="machine" value="{{ machine }}">{% endif %}
+        <label for="week-day">Choose a day</label><input id="week-day" type="date" name="date" required value="{{ day }}">
+        <button class="button primary">Show week</button></form></details>
+        <div class="inspection">
+          <p class="inspection-value">{% if yield_rate != None %}{{ yield_rate|floatformat:1 }}<span>%</span>{% else %}—{% endif %}</p>
+          <p class="inspection-label">Inspection pass rate{% if yield_rate == None %} · No output{% endif %}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <section class="overview" aria-label="Weekly totals">
+    <dl class="stats">
+      <div><dt>Parts made</dt><dd>{{ produced }}</dd></div>
+      <div><dt>Parts accepted</dt><dd>{{ accepted }}</dd></div>
+      <div><dt>Parts rejected</dt><dd>{{ rejected }}</dd></div>
+    </dl>
+  </section>
+  <div class="journal-body">
+    <section class="sheet output" id="output" aria-labelledby="output-heading">
+      <div class="panel-head"><h2 id="output-heading">Daily output</h2></div>
+      <div class="stem-chart" role="radiogroup" aria-label="Daily parts made. Select a day for details.">
+        {% for item in days %}
+          <div class="stem-choice">
+            <label class="stem-day">
+              <input type="radio" name="output-day" aria-label="{{ item.date|date:'l, j M' }}, {% if item.entries %}{{ item.produced }} made, {{ item.accepted }} accepted, {{ item.rejected }} rejected{% else %}no shift saved{% endif %}" {% if item.date == selected_output_day %}checked{% endif %}>
+              <span class="stem-field" aria-hidden="true">{% if item.entries %}
+                <span class="stem" style="height: {% widthratio item.produced peak_output 100 %}%"><span class="stem-count">{{ item.produced }}</span></span>
+              {% else %}<span class="stem-empty">–</span>{% endif %}</span>
+              <span>{{ item.date|date:"D" }}</span>
+            </label>
+            <p class="stem-detail"><strong>{{ item.date|date:"D, j M" }}</strong> · {% if item.entries %}{{ item.produced }} made · {{ item.accepted }} accepted · {{ item.rejected }} rejected{% else %}No shift saved{% endif %}</p>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+    <section class="sheet defects-panel"><div class="panel-head"><h2>Why parts were rejected</h2></div>
+      {% if top_reason %}<p class="reason-summary">{{ top_reason.count }} of {{ rejected }} rejects were due to {{ top_reason.name|lower }}.</p>{% elif not rejected %}<p class="reason-summary">No rejected parts this week.</p>{% endif %}
+      <ul class="reasons">{% for reason in reasons %}<li><div><span>{{ reason.name }}</span><strong>{{ reason.count }}</strong></div><div class="track"><i style="width:{{ reason.share|stringformat:'.6f' }}%"></i></div></li>{% endfor %}</ul>
+    </section>
+  <section class="sheet results" id="machines" aria-labelledby="machines-heading">
+    <div class="panel-head"><div><h2 id="machines-heading">All machines this week</h2>{% if shift_count %}<p><strong>{{ active_average|floatformat:"-1" }} machines ran per shift</strong> on average across {{ shift_count }} recorded shift{{ shift_count|pluralize }} this week.</p>{% endif %}</div><a class="data-link" href="{% url 'report-api' %}?date={{ day }}">Report JSON</a></div>
+    {% if report.machines %}<table><thead><tr><th scope="col">Machine</th><th scope="col">Parts made</th><th scope="col">Parts rejected</th><th scope="col">Most common reason</th></tr></thead>
+      <tbody>{% for row in report.machines %}<tr><th scope="row"><a class="machine-link" href="?date={{ day }}&amp;machine={{ row.machine|urlencode:'' }}">{{ row.display_name }} <span aria-hidden="true">↗</span></a></th>
+        <td data-label="Parts made">{{ row.produced }}</td><td data-label="Parts rejected"><span>{{ row.rejected }} {% if row.rate != None %}<small>{{ row.rate|floatformat:2 }}%</small>{% endif %}</span></td>
+        <td data-label="Most common reason">{{ row.reasons|join:", "|default:"None" }}</td></tr>{% endfor %}</tbody></table>
+    {% else %}<div class="empty">No shifts saved for this week. <a href="?date={{ day }}&amp;entry=1">Add the first shift</a></div>{% endif %}
+  </section>
+  </div>
+  <footer class="project-note"><details><summary>About this project</summary>
+    <p>ShiftLens is a portfolio project inspired by Chandu Mannam’s six months operating a semi-automatic lathe in Chennai. It tracks parts and inspection results by machine and shift. The sample records are fictional.</p>
+    <p>Built with Python, Django, SQLite, and JavaScript.</p>
+  </details></footer>
+{% endif %}
+</main>
+</body>
+</html>
+
